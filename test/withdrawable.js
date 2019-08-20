@@ -6,11 +6,13 @@ var MockWithdrawable = artifacts.require("./MockWithdrawable.sol");
 var Helper = require("./helper.js");
 
 var token;
+var admin;
 
 contract('Withdrawable', function(accounts) {
     it("should test withdraw token success for admin.", async function () {
         //init globals
-        var withdrawableInst = await Withdrawable.new();
+        admin = accounts[0];
+        var withdrawableInst = await Withdrawable.new(admin);
         token = await TestToken.new("tst", "test", 18);
 
         // transfer some tokens to withdrawable.
@@ -28,7 +30,7 @@ contract('Withdrawable', function(accounts) {
 
     it("should test withdraw token reject for non admin.", async function () {
         // transfer some tokens to withdrawable.
-        var withdrawableInst = await Withdrawable.new();
+        var withdrawableInst = await Withdrawable.new(admin);
         await token.transfer (withdrawableInst.address, 100);
 
         try {
@@ -47,7 +49,7 @@ contract('Withdrawable', function(accounts) {
     });
     it("should test withdraw token reject when amount too high.", async function () {
         // transfer some tokens to withdrawable.
-        var withdrawableInst = await Withdrawable.new();
+        var withdrawableInst = await Withdrawable.new(admin);
         await token.transfer (withdrawableInst.address, 100);
 
         try {
@@ -62,7 +64,7 @@ contract('Withdrawable', function(accounts) {
         assert.equal(balance.valueOf(), 100, "unexpected balance in withdrawble contract.");
     });
     it("should test withdraw ether success for admin.", async function () {
-        var mockWithdrawableInst = await MockWithdrawable.new();
+        var mockWithdrawableInst = await MockWithdrawable.new(admin);
         // send some ether to withdrawable.
         await Helper.sendEtherWithPromise(accounts[7], mockWithdrawableInst.address, 10);
 
@@ -73,7 +75,7 @@ contract('Withdrawable', function(accounts) {
         assert.equal(balance.valueOf(), 3, "unexpected balance in withdrawble contract.");
     });
     it("should test withdraw ether reject for non admin.", async function () {
-        var mockWithdrawableInst = await MockWithdrawable.new();
+        var mockWithdrawableInst = await MockWithdrawable.new(admin);
         // send some ether to withdrawable.
         await Helper.sendEtherWithPromise(accounts[7], mockWithdrawableInst.address, 10);
 
@@ -90,7 +92,7 @@ contract('Withdrawable', function(accounts) {
         assert.equal(balance.valueOf(), 10, "unexpected balance in withdrawble contract.");
     });
     it("should test withdraw ether reject when amount too high.", async function () {
-        var mockWithdrawableInst = await MockWithdrawable.new();
+        var mockWithdrawableInst = await MockWithdrawable.new(admin);
         // send some ether to withdrawable.
         await Helper.sendEtherWithPromise(accounts[7], mockWithdrawableInst.address, 10);
 
